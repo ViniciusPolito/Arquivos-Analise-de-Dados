@@ -33,3 +33,27 @@ example(mean)#exemplos
 help.search("mean")#documentação
 help.start()#documentação
 
+X <- 133
+Y <- 36
+Z <- X + Y
+round(log(sqrt(Z)), digits =3)
+
+log(7)
+
+cos(2)
+
+factorial(10)
+
+c = 300000000
+m = 10
+E=m*c^2
+
+v<-c(2,5,7,8,9)
+
+func = function (x) {
+  
+  return (x^3 + x^2 + x)
+  
+}
+
+func(v)
