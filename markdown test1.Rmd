@@ -1,0 +1,87 @@
+---
+title: "Atividade 11"
+author: "Vinicius Barbosa Polito Lopes"
+date: "25/01/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r Martin}
+library(tm)
+library(wordcloud)
+library(readr)
+
+martin<-read_file("Martin.txt")
+VS <- VectorSource(martin)
+corpus<- Corpus(VS)
+
+corpus<- tm_map(corpus, stripWhitespace)
+corpus<- tm_map(corpus, removePunctuation)
+corpus<- tm_map(corpus, content_transformer(tolower))
+corpus<- tm_map(corpus, removeNumbers)
+corpus<- tm_map(corpus, removeWords, stopwords("portuguese"))
+
+tdm<- as.matrix(TermDocumentMatrix(corpus))
+fre<- sort(rowSums(tdm),decreasing=T)
+aux<-subset(fre,fre>2)
+#Palavras frequentes
+barplot(aux,las=2,col = rainbow(10))
+
+#Nuvem de Palavras
+wordcloud(corpus, min.freq = 1, max.words = 30,random.order = F
+          ,rot.per = 0.35,colors = brewer.pal(8,"Dark2"))
+
+
+inspect(corpus)
+```
+```{r Black}
+library(openssl)
+library(httpuv)
+library(base64enc)
+library(twitteR)
+library(NLP)
+library(tm)
+library(RColorBrewer)
+library(wordcloud)
+
+consumer_key<-'QfUE6RQdrz7ldvbBhWhRqiwYW'
+consumer_secret<-'JoUOJuyCR7reN97kaYo4WsHjF4oynjjMb0auk4BqiVYZIVFNUb'
+access_token<-'285680333-727488379512848384-7Eit8IDPNT1zxNUqCjcw5fp8dcn65oD'
+access_secret<-'bJjf8tOVO0YfD7MNDjbPKs1W634O79DGqD5QVLedA70VO'
+
+setup_twitter_oauth(consumer_key,consumer_secret,access_token,access_secret)
+
+
+tweets<- searchTwitter("#BlackLivesMatter",n=500,lang="en")
+tweets<- twListToDF(tweets)
+tweets_t<- paste(tweets$text,collapse = " ")
+tweets_S<- VectorSource(tweets_t)
+corpus<-Corpus(tweets_t)
+
+corpus<- tm_map(corpus, stripWhitespace)
+corpus<- tm_map(corpus, removePunctuation)
+corpus<- tm_map(corpus, content_transformer(tolower))
+corpus<- tm_map(corpus, removeNumbers)
+corpus<- tm_map(corpus, removeWords, stopwords("english"))
+
+
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
