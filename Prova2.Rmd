@@ -1,0 +1,128 @@
+---
+title: "Prova 2"
+author: "Vinicius Barbosa Polito Lopes"
+date: "18/02/2021"
+output: html_document
+---
+
+# Projeto {.tabset}
+
+## VADeaths
+
+```{r Questão 1 - VADeaths}
+
+barplot(VADeaths, main = "Questão 1 - VADeaths",
+        names.arg = colnames(VADeaths),
+        xlab = "Tipo",
+        ylab = "Idade",
+        col = rainbow(5),
+        beside = T)
+legend("topleft", pch = c(15,15,15,15,15),
+       col = rainbow(5),
+       legend = rownames(VADeaths))
+
+```
+
+## ClassificaçãoDoença 
+
+```{r Questão 2 - ClassificaçãoDoença}
+
+p <- c("moderado", "leve", "leve", "severo", "leve", "moderado", 
+               "moderado", "moderado", "leve", "leve", "severo", "leve", "moderado", 
+               "moderado", "leve", "severo", "moderado", "moderado", "moderado", "leve")
+pct <- round(table(p) / sum(table(p)) * 100)
+
+pie(x = table(p),
+    labels = paste(pct, "%", ""),
+    main = "ClassificaçãoDoença",
+    col = rainbow(3))
+legend("topleft", legend = names(table(p)),
+        fill = rainbow(3))
+
+```
+
+## Twitters {.tabset}
+
+### Nuvem
+
+```{r Questão 3 - Nuvem}
+
+library("tm")
+library("wordcloud")
+library("twitteR")
+library("readr")
+library("syuzhet")
+
+consumer_key <- "8Pvnt0kEY2Y2R5YY2hjVp1V8W"
+consumer_secret <- "pHVg2e19CODJEwdrS588NBiob3Hi9rpDsSum2IfXyibEjqPz4A"
+access_token <- "1296120329413296128-JcqrjHQKh6ExW0kpjFSzLPAYlLNBNy"
+access_secret <- "wy8wRf6dTvZ3BEsRHe1VgGioarDWtbx6o7tFzGKUYN9cc"
+
+setup_twitter_oauth(consumer_key, consumer_secret, access_token, access_secret)
+
+#---
+
+tweets <- searchTwitter("#racismo", n=600, lang="pt")
+
+tweets <- twListToDF(tweets)
+
+tweets_t <- paste(tweets$text, collapse = " ")
+
+tweets_S <- VectorSource(tweets_t)
+
+corpus <- Corpus(tweets_S)
+
+corpus <- tm_map(corpus, tolower)
+corpus <- tm_map(corpus, removePunctuation)
+corpus <- tm_map(corpus, stripWhitespace)
+corpus <- tm_map(corpus, removeWords, stopwords('portuguese'))
+
+removeURL <- function(x) gsub("http[^[:space:]]*", "", x)
+corpus <- tm_map(corpus, removeURL)
+
+removeNumPunct <- function(x) gsub("[^[:alpha:][:space:]]*", "", x)
+corpus <- tm_map(corpus, content_transformer(removeNumPunct))
+
+wordcloud(corpus, min.freq = 1, max.words = 60, random.order = FALSE, rot.per = 0.35, colors = brewer.pal(8, "Dark2"))
+
+```
+
+### Sentimentos
+
+```{r Questão 3 - Sentimentos}
+
+tweets <- tweets$text
+
+s <- get_nrc_sentiment(tweets)
+
+barplot(colSums(s), las = 2, col = rainbow(10), 
+        ylab = "Quantidade", 
+        main = "Pontuação de Sentimentos para os twittes racismo")
+
+```
+
+
+## Teorema
+
+```{r Questão 4 - Teorema}
+
+#setwd("C:/Users/vinib/Desktop/Arquivos-Analise-de-Dados-main")
+
+flu <- read.csv("flu.csv", header = T, strip.white = T, na.strings = "", stringsAsFactors = T)
+
+hist(flu$age,col =  rainbow(20), probability = T,
+     main = "Histograma sobre a gripe Espanhola")
+lines(density(flu$age))
+
+#---
+
+xbar <- rep(NA, 200)
+for (i in 1:200){
+  minhaAmostra <- sample(flu$age, 35)
+  xbar[i] <- mean(minhaAmostra)
+}
+
+hist(xbar, col = rainbow(20), probability = T,
+     main = "Histograma sobre a gripe Espanhola (Normalizado)")
+lines(density(xbar))
+```

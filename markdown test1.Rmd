@@ -3,17 +3,12 @@ title: "Atividade 11"
 author: "Vinicius Barbosa Polito Lopes"
 date: "25/01/2021"
 output: html_document
+bibliography: C:\\Users\\vinib\\Documents\\.bib
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
+# Questões {.tabset}
 
-## R Markdown
-
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+## Questão 1
 
 ```{r Martin}
 library(tm)
@@ -33,55 +28,108 @@ corpus<- tm_map(corpus, removeWords, stopwords("portuguese"))
 tdm<- as.matrix(TermDocumentMatrix(corpus))
 fre<- sort(rowSums(tdm),decreasing=T)
 aux<-subset(fre,fre>2)
-#Palavras frequentes
+#Palavras frequentes#Resposta 1.2
 barplot(aux,las=2,col = rainbow(10))
 
-#Nuvem de Palavras
+#Nuvem de Palavras#Resposta 1.1
 wordcloud(corpus, min.freq = 1, max.words = 30,random.order = F
           ,rot.per = 0.35,colors = brewer.pal(8,"Dark2"))
 
-
-inspect(corpus)
 ```
+
+## Questão 2
+
 ```{r Black}
-library(openssl)
-library(httpuv)
-library(base64enc)
 library(twitteR)
-library(NLP)
 library(tm)
-library(RColorBrewer)
+library(syuzhet)
 library(wordcloud)
 
-consumer_key<-'QfUE6RQdrz7ldvbBhWhRqiwYW'
-consumer_secret<-'JoUOJuyCR7reN97kaYo4WsHjF4oynjjMb0auk4BqiVYZIVFNUb'
-access_token<-'285680333-727488379512848384-7Eit8IDPNT1zxNUqCjcw5fp8dcn65oD'
-access_secret<-'bJjf8tOVO0YfD7MNDjbPKs1W634O79DGqD5QVLedA70VO'
+consumer_key<-"gKKPDkQlrNOvRixhdlZ2FZzYU"
+consumer_secret<-"gviohupaUSY16PY43knZ0bj5f1GyFizK3Fr0MU8UyjGHqZCNpi"
+access_token<-"1333392592545980416-Z6tuysNufrweztsGxRcdZigCVI6Uph"
+access_secret<-"pB5HvIPwIQiaukeK0rh2nqpJOFXwwXi2b2Mw0KgBIdGFQ"
 
 setup_twitter_oauth(consumer_key,consumer_secret,access_token,access_secret)
-
 
 tweets<- searchTwitter("#BlackLivesMatter",n=500,lang="en")
 tweets<- twListToDF(tweets)
 tweets_t<- paste(tweets$text,collapse = " ")
 tweets_S<- VectorSource(tweets_t)
-corpus<-Corpus(tweets_t)
+corpus<-Corpus(tweets_S)
 
-corpus<- tm_map(corpus, stripWhitespace)
+corpus<- tm_map(corpus, tolower)
 corpus<- tm_map(corpus, removePunctuation)
-corpus<- tm_map(corpus, content_transformer(tolower))
-corpus<- tm_map(corpus, removeNumbers)
+corpus<- tm_map(corpus, stripWhitespace)
 corpus<- tm_map(corpus, removeWords, stopwords("english"))
 
+removeURL<-function(x) gsub("http[^[:space:]]*", "",x)
+corpus<- tm_map(corpus,removeURL)
+
+removeNumPunct<- function(x) gsub("[^[:alpha:][:space:]]*","",x)
+corpus<- tm_map(corpus,content_transformer(removeNumPunct))
+
+dtm<-TermDocumentMatrix(corpus)
+dtm<- as.matrix(dtm)
+
+fre<- sort(rowSums(dtm),decreasing=T)
+#Resposta 2.1
+wordcloud(corpus,min.freq = 2,max.words = 30,random.order = F,rot.per = 0.15,colors = brewer.pal(8,"Dark2"),scale = c(8,.2))
+
+#Resposta 2.2
+s<-get_nrc_sentiment(tweets_t)
+barplot(colSums(s), las=2,col = rainbow(10),
+        ylab = "Contagem",main = "Sentimentos com Relação ao STF")
+
+
 
 ```
 
-## Including Plots
+## Questão 3
 
-You can also embed plots, for example:
+$$ f(x) = \beta_0 + \beta_1 x + \beta_2 x^2 + \beta_3 x^3 + \beta_4 (x-\xi)^3_+ $$
+$$
+(x-\xi)^3_+ =
+\begin{cases}
+ (x-\xi)^3\, ,& x>\xi \\
+ 0  ,& x\leq\xi
+ \end{cases}       
+$$
+$$
+\begin{aligned}
+  (x \leq \xi) \Rightarrow f(x) &= \beta_0 + \beta_1 x + \beta_2 x^2 + \beta_3 x^3 \\
+  (x > \xi) \Rightarrow f(x) &= \beta_0 + \beta_1 x + \beta_2 x^2 + \beta_3 x^3 + \beta_4(x^3 -3x^2\xi + 3x\xi^2 - \xi^3) \\
+  &=(\beta_0 + \beta_4\xi^3) + (\beta_1 + 3\beta_4\xi^2)x + (\beta_2 - 3\beta_4)
+\end{aligned}
+$$
+$$ \\frac{\\partial \\bar{x}}{\\partial t} $$
+$$ \\alpha_{\\beta}^{\\ga,,a} $$
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+## Questão 4
+
+![Foto 1](C:/Users/vinib/Downloads/download.jpg) 
+![Foto 2](C:/Users/vinib/Downloads/downloade.jpg)
+
+
+```{r Tabela R}
+library(DT)
+datatable(airquality)
+datatable(ToothGrowth)
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+## Questão 5
+
+@gable2000search
+
+@croft2010search
+
+@sampaio2018reducing
+
+@sampaio2019decentralized
+
+@sampaio2019multi
+
+
+
+
+### Referências

@@ -1,0 +1,250 @@
+---
+title: "Atividade 12"
+author: "Vinicius Barbosa Polito Lopes"
+date: "31/01/2021"
+output: html_document
+---
+
+# Questões {.tabset}
+
+## Questão 1
+
+```{r Questão1}
+
+#Informações
+MRT_1F <-c(517.1468515630205, 85.13094142168089, 30.333207896694553, 12.694776264558937, 3.3041601673945418, 1.1823111717498882, 1.1892293502386786)
+
+MRT_3F <-c(156.68929936163462, 11.540837783562276, 0.4512835621696538, 0.4509797929766453, 0.4502068233039181, 0.4496185276300172, 0.4543157082191288)
+
+MRT_5F <-c(83.90319666471157, 0.3068151086494968, 0.30522314133037304, 0.3072588968084928, 0.30655265997285697, 0.3055812715727718, 0.3053297166713006)
+
+MRT_10F <-c(29.55430642951759, 0.19832832665772515, 0.1971923924717474, 0.19796648905716516, 0.19615594370806338, 0.2034569237883263, 0.19617420889447737)
+
+MRT_15F <-c(11.317736530583566, 0.167364215666193, 0.16172168266811013, 0.16701085329580515, 0.1598052657153692, 0.1645934043532696, 0.16216563797118075)
+
+MRT_sem_F <-c(11.93430909937736, 0.6095414637034009, 0.6060645101029295, 0.612167181646899, 0.6146761002685637, 0.6096747087200697, 0.6125810476877268)
+
+clock <- c(0.1, 0.5, 1, 1.5, 2, 2.5, 3)
+
+#Grafico 1
+plot(clock,MRT_1F, type="o",pch=4,cex=2,col="black",
+     xlab = "Clock",ylab="MRT")
+lines(clock,MRT_3F,type = "o",pch=11,cex=2,col="yellow")
+lines(clock,MRT_5F,type = "o",pch=1,cex=2,col="red")
+lines(clock,MRT_10F,type = "o",pch=2,cex=2,col="blue")
+lines(clock,MRT_15F,type = "o",pch=5,cex=2,col="purple")
+lines(clock,MRT_sem_F,type = "o",pch=11,cex=2,col="green")
+
+legend("topright", pch = c(4, 11, 1, 2, 5, 4), col = c("black", "yellow", "red", "blue", "purple", "green"), legend = c("1 Fog", "3 Fogs", "5 Fogs", "10 Fogs", "15 Fogs", "w/o Fog"),lty=1, cex=0.8)
+#Graficos 2
+value<-matrix(c(MRT_sem_F,MRT_1F),nrow=2,ncol=7,byrow=T)
+value1<-matrix(c(MRT_sem_F,MRT_3F),nrow=2,ncol=7,byrow=T)
+value2<-matrix(c(MRT_sem_F,MRT_5F),nrow=2,ncol=7,byrow=T)
+value3<-matrix(c(MRT_sem_F,MRT_10F),nrow=2,ncol=7,byrow=T)
+value4<-matrix(c(MRT_sem_F,MRT_15F),nrow=2,ncol=7,byrow=T)
+
+layout(matrix(c(1, 4, 0,
+                2, 5, 0,
+                3, 0, 0), nr=3, byrow=T))
+#Plot 1
+barplot(value,col=c("#E6E6E6", "#666666"),log="y",
+     xlab = "Time between Things requests",
+        ylab = "Response time(s)",beside = T)
+legend("topright", inset=.02, legend = c("w/o Fog", "1 Fog"), fill=c("#E6E6E6", "#666666"), cex=0.8)
+#Plot 2
+barplot(value1,col=c("#E6E6E6", "#666666"),log="y",
+     xlab = "Time between Things requests",
+        ylab = "Response time(s)",beside = T)
+legend("topright", inset=.02, legend = c("w/o Fog", "3 Fog"), fill=c("#E6E6E6", "#666666"), cex=0.8)
+#Plot 3
+barplot(value2,col=c("#E6E6E6", "#666666"),log="y",
+     xlab = "Time between Things requests",
+        ylab = "Response time(s)",beside = T)
+legend("topright", inset=.02, legend = c("w/o Fog", "5 Fog"), fill=c("#E6E6E6", "#666666"), cex=0.8)
+#Plot 4
+barplot(value3,col=c("#E6E6E6", "#666666"),log="y",
+     xlab = "Time between Things requests",
+        ylab = "Response time(s)",beside = T)
+legend("topright", inset=.02, legend = c("w/o Fog", "10 Fog"), fill=c("#E6E6E6", "#666666"), cex=0.8)
+#Plot 5
+barplot(value4,col=c("#E6E6E6", "#666666"),log="y",
+     xlab = "Time between Things requests",
+        ylab = "Response time(s)",beside = T)
+legend("topright", inset=.02, legend = c("w/o Fog", "15 Fog"), fill=c("#E6E6E6", "#666666"), cex=0.8)
+
+
+```
+
+## Questão 2
+
+```{r Questão2}
+
+good<-c(53.8,33.9,2.6,0)
+veryGood<-c(43.6,54.2,60.5,21.4)
+excellent<-c(2.6,11.9,36.8,78.6)
+
+value<-matrix(c(good, veryGood, excellent),
+              nrow = 3,
+              ncol = 4,
+              byrow = TRUE)
+
+barplot(value,
+        col = c("red", "yellow","green"),
+        names.arg = c("$10-19", "$20-29", "$30-39", "$40-49"),
+        xlab = "Meal Price",
+        ylab = "Quality Percentage", main = "")
+
+legend("topright",
+       inset=.02,
+       legend = c("Good", "Very Good", "Excellent"),
+       fill=c("red", "yellow","green"))
+```
+
+## Questão 3
+
+```{r Questão3}
+maio<-airquality[airquality$Month==5,]
+maio$Temp<-((maio$Temp -32) /1.8)
+temperatura<-maio$Temp
+
+hist(temperatura,col=rainbow(8),
+     main ="Histogram of Temperature",
+     xlab = "Temperatura",
+     ylab="Dias",
+     probability = TRUE)
+densidadeTemp <- density(temperatura)
+
+lines(densidadeTemp)
+```
+
+## Questão 4
+
+```{r Questão4}
+sales <- read.table("https://training-course-material.com/images/8/8f/Sales.txt",header=TRUE)
+
+(sales$SALES/sum(sales$SALES))
+
+pie(sales$SALES,
+    labels= paste(round((sales$SALES/sum(sales$SALES)*100)),"%"), 
+    col=rainbow(6),
+    main="Vendas por País")
+legend("topright",
+       inset=.02,
+       legend = c("US", "UK", "France","Poland","Japan","China"),
+       fill=rainbow(6))
+
+```
+
+## Questão 5
+
+```{r Questão5}
+
+inc<-InsectSprays
+
+boxplot(count~spray,
+        data=InsectSprays,
+        xlab = "Tipos de Sprays",
+        ylab = "Contagem",
+        outline=F,
+        col="yellow",
+        main="Dados sobre Inseticidas")
+
+```
+
+## Questão 6
+
+```{r Questão6}
+m<-mtcars
+
+plot(mtcars$wt~mtcars$mpg,
+     xlab = "Peso dos carros por 1000 lbs",
+     ylab = "Milhas por galão",
+     main="Peso de carros por milhas",
+     col=mtcars$wt)
+
+abline(a= coef(lm(wt~mpg, mtcars)),
+       col="red")
+
+```
+
+## Questão 7
+```{r Questão7}
+monitoringCloudData_NONE <- read.csv('monitoringCloudData_NONE.csv',
+                                     header = T, strip.white = T, na.strings = "", stringsAsFactors = T)#MB
+monitoringCloudData_0.1 <- read.csv('monitoringCloudData_0.1.csv',
+                                     header = T, strip.white = T, na.strings = "", stringsAsFactors = T)#MB,GB
+monitoringCloudData_0.5 <- read.csv('monitoringCloudData_0.5.csv',
+                                    header = T, strip.white = T, na.strings = "", stringsAsFactors = T)#MB,GB
+monitoringCloudData_1 <- read.csv('monitoringCloudData_1.csv',
+                                    header = T, strip.white = T, na.strings = "", stringsAsFactors = T)#MB
+#NONE
+monitoringCloudData_NONE$usedMemory <- as.numeric(gsub("MB", "" ,monitoringCloudData_NONE$usedMemory))
+#0.1
+a<-monitoringCloudData_0.1$usedMemory
+a<-as.character(a)
+c<-substr(a,nchar(a)-1,nchar(a))
+Data_0.1GB <- monitoringCloudData_0.1[which(c=="GB"),]
+Data_0.1GB$usedMemory <- as.numeric(gsub("GB", "" ,Data_0.1GB$usedMemory))
+Data_0.1GB$usedMemory <- Data_0.1GB$usedMemory * 1024
+Data_0.1MB <- monitoringCloudData_0.1[which(c=="MB"),]
+Data_0.1MB$usedMemory <- as.numeric(gsub("MB", "" ,Data_0.1MB$usedMemory))
+monitoringCloudData_0.1<-merge(Data_0.1GB,Data_0.1MB,all = T)
+#0.5
+a<-monitoringCloudData_0.5$usedMemory
+a<-as.character(a)
+c<-substr(a,nchar(a)-1,nchar(a))
+Data_0.5GB <- monitoringCloudData_0.5[which(c=="GB"),]
+Data_0.5GB$usedMemory <- as.numeric(gsub("GB", "" ,Data_0.5GB$usedMemory))
+Data_0.5GB$usedMemory <- Data_0.5GB$usedMemory * 1024
+Data_0.5MB <- monitoringCloudData_0.5[which(c=="MB"),]
+Data_0.5MB$usedMemory <- as.numeric(gsub("MB", "" ,Data_0.5MB$usedMemory))
+monitoringCloudData_0.5<-merge(Data_0.5GB,Data_0.5MB,all = T)
+#1
+monitoringCloudData_1$usedMemory <- as.numeric(gsub("MB", "" ,monitoringCloudData_1$usedMemory))
+
+
+monitoringCloudData_NONE$currentTime <- as.POSIXlt(monitoringCloudData_NONE$currentTime)
+monitoringCloudData_0.1$currentTime <- as.POSIXlt(monitoringCloudData_0.1$currentTime)
+monitoringCloudData_0.5$currentTime <- as.POSIXlt(monitoringCloudData_0.5$currentTime)
+monitoringCloudData_1$currentTime <- as.POSIXlt(monitoringCloudData_1$currentTime)
+
+monitoringCloudData_NONE$currentTime <- difftime(monitoringCloudData_NONE$currentTime, 
+                                                 min(monitoringCloudData_NONE$currentTime),
+                                                 units = 'hours')
+monitoringCloudData_0.1$currentTime <- difftime(monitoringCloudData_0.1$currentTime, 
+                                                 min(monitoringCloudData_0.1$currentTime),
+                                                 units = 'hours')
+monitoringCloudData_0.5$currentTime <- difftime(monitoringCloudData_0.5$currentTime, 
+                                                 min(monitoringCloudData_0.5$currentTime),
+                                                 units = 'hours')
+monitoringCloudData_1$currentTime <- difftime(monitoringCloudData_1$currentTime, 
+                                                 min(monitoringCloudData_1$currentTime),
+                                                 units = 'hours')
+layout(matrix(c(1,2,
+                3,4), nrow = 2, byrow = TRUE))
+
+plot(monitoringCloudData_NONE$currentTime, monitoringCloudData_NONE$usedMemory,
+     type = 'l', col = 'black', 
+     xlab = "Time (hour)", 
+     ylab = "Used Memory (MB)",
+     main = "Memory Analysis (None Workload)")
+
+plot(monitoringCloudData_0.1$currentTime, monitoringCloudData_0.1$usedMemory,
+     type = 'l', col = 'black', 
+     xlab = "Time (hour)", 
+     ylab = "Used Memory (MB)",
+     main = "Memory Analysis (Workload of 0.1)")
+
+plot(monitoringCloudData_0.5$currentTime, monitoringCloudData_0.5$usedMemory,
+     type = 'l', col = 'black', 
+     xlab = "Time (hour)", 
+     ylab = "Used Memory (MB)",
+     main = "Memory Analysis (Workload of 0.5)")
+
+plot(monitoringCloudData_1$currentTime, monitoringCloudData_1$usedMemory,
+     type = 'l', col = 'black', 
+     xlab = "Time (hour)", 
+     ylab = "Used Memory (MB)",
+     main = "Memory Analysis (Workload of 1.0)")
+
+```

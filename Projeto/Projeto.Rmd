@@ -1,0 +1,435 @@
+---
+title: "Análise das taxas de suicidio do mundo entre 1990-2016 "
+author: "Vinicius Barbosa Polito Lopes"
+date: "05/02/2021"
+output: html_document
+---
+
+# Projeto {.tabset}
+
+## Introdução
+
+### O que é?
+
+"Suicídio é o ato de causar a própria morte de forma intencional." 
+
+"O comportamento intencional de tirar a própria vida é resultado da soma de diversos fatores de origem emocional, psíquica, social e cultural. O indivíduo busca na morte o alívio, uma forma de fugir daquilo que o deprime, que o exclui de maneira insuportável. Decepções amorosas, problemas familiares ou financeiros, depressão, transtornos de personalidade, abuso de substâncias químicas, são alguns dos fatores. Claro que nem sempre tais fatores atuam como causa direta, mas podem potencializar o risco da depressão e levar ao suicídio."
+
+### Problema
+
+Segundo a OMS, a segunda principal causa de mortes entre jovens de 15-29 anos é suicidio. Só perdendo para acidentes nas estradas.
+
+Com 800 mil mortes, o suicídio está entre as 20 principais causas de morte em todo o mundo. Mais pessoas perdem a vida para esse problema do que para doenças como malária e câncer de mama ou mesmo guerra e homicídio.
+
+E principalmente, o  suicídio é evitável, algumas medidas como restringir o acesso aos meios pelos quais a pessoa pode se matar; educar a mídia sobre denúncia responsável de suicídio; implementar programas entre os jovens para desenvolver habilidades que os permitam lidar com o estresse, são algumas formas de evitar esse acontecimento.
+
+### Abordagem
+
+Diante deste problema, este trabalho irá apresentar a evolução das taxas de suicidio no mundo, apresentando quais grupos são mais suscetíveis a cometer esse ato.
+Além de fazer uma relação com indicadores socioeconômicos como o IDH e o PIB. Dessa forma, será possivel planejar soluções para esse problema dando maior ênfase aos grupos mais afetados.
+
+### Potenciais usuários
+
+Este trabalho servirá como parâmetro para médicos e educadores. Ele será útil mostrar quais segmentos são mais afetados pelo suicidio, podendo ajudar na prevenção desse problema, logo que eles terão estatisticas de grupos mais afetados.
+
+## Pacotes Requeridos
+
+```{r Library, include= F, echo=F}
+
+library(stringr)
+library(dplyr)
+library(tidyr)
+library(knitr)
+library(DT)
+library(rmarkdown)
+
+```
+
+```{r Pacotes, echo=F}
+
+Pacote<-c("library(stringr)","library(dplyr)","library(tidyr)","library(knitr)","library(rmarkdown)","library(DT)")
+
+Descrição <- c("Manipulação de strings e expressões regulares","Manipulação avançada de dados","Limpeza de dados","Geração de tabelas no R Markdown","Geração de tabelas no R Markdown","Visualização de dados em tabelas")
+
+pacote <- data.frame(Pacote,Descrição)
+
+kable(pacote[1:6,])
+
+```
+
+## Preparação dos dados
+
+### Fonte dos dados 
+
+Os dados para a realização desse trabalho foram obtidos por meio da plataforma Kaggle.
+Estes dados podem ser encontrados no seguinte link:
+[Suicide Rates Overview 1985 to 2016 | Kaggle](https://www.kaggle.com/russellyates88/suicide-rates-overview-1985-to-2016).
+O link sobre [Human development index (HDI)](http://hdr.undp.org/en/indicators/137506) também pode ser encontrado na página do [Suicide Rates Overview 1985 to 2016 | Kaggle](https://www.kaggle.com/russellyates88/suicide-rates-overview-1985-to-2016) como referência, mas para destacar sua utilização nesse projeto, também partilhando sua fonte aqui. 
+
+### Explicação sobre os dados {.tabset}
+
+O conjunto de dados do [Suicide Rates Overview 1985 to 2016 | Kaggle](https://www.kaggle.com/russellyates88/suicide-rates-overview-1985-to-2016) foi originalmente utilizado para correlacionar as taxas de suicidio com fatores socioeconômicos de diferentes paises entre 1985-2016, com sua última alteração tendo sido realizada em 2018. Esse conjunto conta com 27,820 linhas e 19 colunas diferentes. Enquanto o conjunto do [Human development index (HDI)](http://hdr.undp.org/en/indicators/137506) foi utilizado para indicar o IDH do paises por ano. Esse conjunto contém 206 linhas e 62 colunas. 
+
+#### Suicide Rates
+
+Esse conjunto conta com informações sobre suicidio e questões socioeconômicos em diferentes paises durante os anos de 1985-2016.
+
+```{r Explicação Suicide Rates}
+
+suicideTable <- read.csv("master.csv",header = T,strip.white = T,na.strings = "",stringsAsFactors = T)
+paged_table(suicideTable[1:5,])
+
+```
+#### IDH
+
+Esse é o conjunto de informações do IDH de diferentes paises durante 1990-2019, vale ressaltar que o conjunto de Suicide rates contém uma coluna de IDH com alguns valores incompletos, logo esse dataset é para completar as colunas faltantes.
+
+```{r Explicação IDH}
+
+IDH <- read.table("Human Development Index (HDI).csv",header = T,strip.white = T, sep = ",",
+           dec = ".", na.strings = "",skip = 5)
+
+paged_table(IDH[1:5,])
+
+```
+
+### Limpeza dos Dados {.tabset}
+
+Uma vez importados os dados, foi realizada uma limpeza em cada um dos datasets, antes de sua junção.
+
+#### Suicide Rates
+
+Nesse conjunto de dados, foi retirado algumas colunas para junção com a tabela HDI posteriormente. Além disso, só foram pegos os valores dos anos 1990 até 2016, logo que o dataset HDI da UNITED NATIONS DEVELOPMENT PROGRAMME(UNDP) não tinha informações dos anos de 1985-1989.
+
+```{r Limpeza Suicide Rates}
+#Tira coluna HDI com valores desatualizados
+suicideTableClean <- suicideTable[,-c(1,9)]
+
+#Remove valores anteriores de 1990
+suicideTableClean <- suicideTableClean[which(suicideTableClean$year >= 1990),]
+
+```
+
+#### IDH
+
+Nesse conjunto de dados, foi retirado um conjunto de colunas em branco, também foram alterados os nomes de algumas colunas. Foram retirados alguns espaços em brancos em certas variaveis. Por fim, a estrutura do dataset foi alterada para se encaixar melhor quando for alocado com o dataset de Suicide Rates.
+
+```{r Limpeza IDH}
+
+#Dropei colunas inuteis
+odd_indexes<-seq(5,61,2)
+IDHClean <- IDH[,c(1:3,odd_indexes)]
+
+#Tirei espaços em brancos da variaveis de Country
+IDHClean$Country <-sub(" ", "", IDHClean$Country)
+
+#Ajeitei o nome das colunas de IDH
+names(IDHClean)[3:32]<-sub(".", "", names(IDHClean)[3:32])
+
+#Retirei as colunas dos anos de 2017-2019
+IDHClean <- IDHClean[,1:29]
+
+#Alterei estrutura do dataset
+IDHClean <- IDHClean %>% gather(key="year", value = "HDI", -c(Country, HDI.Rank))
+
+#Criei nova coluna para merge com suicideRates
+IDHClean<-mutate(IDHClean, country.year= (paste(Country,year,sep="")))
+
+#Tirei coluna year
+IDHClean<- IDHClean[,-3]
+
+```
+
+### Conjunto de Dados Finalizado
+
+Esse é o conjunto de dados final, com um total de 23382 linhas e 12 colunas. O conjunto é uma junção do Suicide Rates dataset e HDI dataset. 
+Abaixo segue um exemplo da estrutura do conjunto com 30 linhas após sua união.
+```{r Dados}
+
+df <- merge(x=suicideTableClean,y=IDHClean, by= "country.year")
+dataset <- df %>% select(Country,year,sex,age,suicides_no,population,suicides.100k.pop,HDI.Rank,HDI,country.year,gdp_for_year....,gdp_per_capita....,generation)
+
+paged_table(dataset[1:30,])
+
+```
+### Dicionário dos Dados
+```{r Dicionário, echo=F}
+
+Coluna<-c("Country","year","sex","age","suicides_no","population","suicides.100k.pop","HDI.Rank","HDI","gdp_for_year....","gdp_per_capita....","generation")
+
+Tipo <- c("Character","Integer","Factor","Factor","Integer","Integer","Numeric","Integer","Character","Factor","Integer","Factor")
+
+Descrição <- c("Pais","Ano","Gênero","Faixa de idade de grupo específico", "Número de Suicidios",
+               "Tamanho da população no ano","Média de suicidios a cada 100mil pessoas","Ranqueamento em relação a outros paises","IDH atual",
+               "PIB por ano","PIB por individuo","Geração")
+
+pacote <- data.frame(Coluna,Tipo,Descrição)
+
+kable(pacote[1:12,])
+
+```
+
+
+## Análise exploratória dos dados
+
+Para facilitação na observação dos dados, este tópico foi dividido em duas partes. A primeira parte é a análise quantitativa, enquanto a segunda é a análise correlativa Vale ressaltar que todos os dados não especificados são referentes a acontecimentos do mundo inteiro durante os anos de 1990-2016.
+
+### Análise Quantitativa {.tabset}
+
+Essas são análises mais diretas que podem ser obtidas diretamente do dataset com poucas alterações.
+
+#### Faixa etária / Gerações
+
+Nessa tabela, é possivel ver os diferentes tipos de faixa de idade encontrados no dataset e também ver as diferentes gerações. Uma informação que vale ressaltar é que devido os dados serem de diferentes periodos de tempo, algumas faixas de idade não correspondem necessariamente a apenas uma geração especifica, logo não é possivel dizer que uma faixa de etária é referente a uma geração especifica.
+
+```{r Analise Age}
+
+age<-dataset
+
+age$age<- factor(dataset$age, levels = c("5-14 years","15-24 years", "25-34 years", "35-54 years","55-74 years","75+ years"))
+age$generation<- factor(dataset$age, levels = c("Generation Z","Millenials","Generation X","Boomers","Silent","G.I. Generation"))
+
+ageset <- data.frame(levels(age$age),levels(age$generation))
+
+kable(ageset,col.names = c("Idades","Geração"))
+
+```
+
+#### Paises
+
+Essa tabela mostra de quais paises os dados foram utilizados. Vale ressaltar que o número de paises encontrados nesse dataset é 93.
+
+```{r Analise Paises}
+
+country<- as.factor(dataset$Country)
+
+country<- as.character(levels(country))
+
+country<- data.frame(country[1:15],country[16:30],country[31:45],country[46:60],country[61:75],country[76:90],country[91:93])
+
+kable(country,col.names = c("","","","Paises","","",""))
+
+
+```
+
+
+### Análise Correlativa {.tabset}
+
+#### Faixa etária
+
+O seguinte gráfico mostra quais grupos de faixa etária cometeram suicidios no mundo durante 1990-2016. Isso pode nos mostrar qual fase da vida somos mais suscetíveis a cometer suicidio.
+
+```{r Analise S/Age}
+
+group <- group_by(dataset,age)
+
+df_aux<-summarise(group, mean(suicides_no))
+
+pct<- round((df_aux$`mean(suicides_no)`)/(sum(df_aux$`mean(suicides_no)`))*100)
+
+lbls<-paste(df_aux$age, pct)
+
+lbls<-paste(lbls,"%",sep = "")
+
+pie(df_aux$`mean(suicides_no)`,labels = lbls,main ="Percentual de Suicidios por Faixa Etária",col = rainbow(6))
+
+
+```
+
+#### Gênero
+
+O seguinte gráfico mostra a divisão de suicidios cometidos por gênero no mundo durante 1990-2016. Isso pode nos mostrar qual gênero é mais predisposto a cometer suicidio.
+
+```{r Analise S/Sex}
+
+group <- group_by(dataset,sex)
+
+df_aux<-summarise(group, mean(suicides_no))
+
+pct<- round((df_aux$`mean(suicides_no)`)/(sum(df_aux$`mean(suicides_no)`))*100)
+
+lbls<-paste(df_aux$sex, pct)
+
+lbls<-paste(lbls,"%",sep = "")
+
+pie(df_aux$`mean(suicides_no)`,labels = lbls,main ="Percentual de Suicidios por Gênero",col = c("Red","Blue"))
+
+
+```
+
+#### Nações
+
+O seguinte gráfico mostra quais nações foram mais relevantes em relação a quantidade de suicidios nos anos de 1990-2016. O trecho "Paises restantes" faz refêrencia a todos os demais paises juntos, logo que se todos fossem plotados no gráfico, ficaria inviável de serem apresentados pela quantidade de paises encontrados no dataset. Essa análise pode nos mostrar quais paises são mais propensos a ter pessoas cometendo suicidio. 
+
+```{r Analise S/Country}
+
+group <- group_by(dataset,Country)
+
+df_aux<-summarise(group, sum(suicides_no))
+
+all<-arrange(df_aux,desc(`sum(suicides_no)`))
+top<-all[1:7,]
+rest<-all[-c(1:7),]
+rest.Suicide.number <-sum(rest$`sum(suicides_no)`)
+
+vet<-c(top$`sum(suicides_no)`,rest.Suicide.number )
+
+pct<- round((vet)/(sum(vet))*100)
+
+lbls<-paste(c(top$Country,"Paises restantes"), pct)
+
+lbls<-paste(lbls,"%",sep = "")
+
+pie(vet,main ="Percentual de Países com maior número de suicidios",labels = lbls,col = rainbow(10) )
+
+
+```
+
+#### Tempo
+
+O seguinte gráfico mostra a evolução do número de suicidios no globo por ano. Dessa forma é possivel ver se as medidas utilizadas durante o periodo anual tiveram impacto para a redução do número de suicidios.
+
+```{r Analise S/Y}
+
+group <- group_by(dataset,year)
+
+df_aux<-summarise(group, sum(suicides_no))
+
+plot( df_aux$year,df_aux$`sum(suicides_no)`,type = "o",main = "Número de suicidios por ano",xlab = "Anos",ylab = "Quantidade de Suicidios")
+
+```
+
+Aqui podemos ver a evolução do número de suicidios por ano divididos por faixa etária.
+
+```{r Analise S/Y/Age}
+
+g1 <- filter(dataset,age=="5-14 years")
+
+group1 <- group_by(g1,year)
+
+df_aux1<-summarise(group1, sum(suicides_no))
+#--
+g2 <- filter(dataset,age=="15-24 years")
+
+group2 <- group_by(g2,year)
+
+df_aux2<-summarise(group2, sum(suicides_no))
+#--
+g3 <- filter(dataset,age=="25-34 years")
+
+group3 <- group_by(g3,year)
+
+df_aux3<-summarise(group3, sum(suicides_no))
+#--
+g4 <- filter(dataset,age=="35-54 years")
+
+group4 <- group_by(g4,year)
+
+df_aux4<-summarise(group4, sum(suicides_no))
+#--
+g5 <- filter(dataset,age=="55-74 years")
+
+group5 <- group_by(g5,year)
+
+df_aux5<-summarise(group5, sum(suicides_no))
+#--
+g6 <- filter(dataset,age=="75+ years")
+
+group6 <- group_by(g6,year)
+
+df_aux6<-summarise(group6, sum(suicides_no))
+#--
+
+plot( df_aux4$year,df_aux4$`sum(suicides_no)`,type = "o",col="red",main = "Número de suicidios por ano",xlab = "Anos",ylab = "Quantidade de Suicidios")
+
+lines(df_aux2$year,df_aux2$`sum(suicides_no)`,type = "o",col="blue")
+lines(df_aux1$year,df_aux1$`sum(suicides_no)`,type = "o",col="orange")
+lines(df_aux3$year,df_aux3$`sum(suicides_no)`,type = "o",col="grey")
+lines(df_aux5$year,df_aux5$`sum(suicides_no)`,type = "o",col="green")
+lines(df_aux6$year,df_aux6$`sum(suicides_no)`,type = "o",col="purple")
+
+legend("topleft",fil = c("orange","blue","grey","red","green","purple"),legend = c("5-14 years","15-24 years", "25-34 years", "35-54 years","55-74 years","75+ years"))
+
+```
+
+
+#### IDH
+
+Aqui dividi os paises em 4 grupos diferentes:
+Low IDH Rate, paises com IDH entre 0.350-0.554; Medium IDH Rate, paises com IDH entre 0.555-0.699; 
+High IDH Rate, paises com IDH entre 0.700-0.799; Very High IDH Rate, paises com IDH entre 0.800-1
+
+Então fiz a comparação do número de mortes com o PIB médio, dessa forma mostrando a predisposição das pessoas ao ato do suicidio, em relação ao PIB por pessoa. 
+
+```{r Analise s/PIB}
+
+countryNA <- filter(dataset, HDI == "..")
+countryLow <- filter(dataset, HDI > 0.350 & HDI < 0.554)
+countryMedium <- filter(dataset, HDI > 0.555 & HDI < 0.699 )
+countryHigh <- filter(dataset, HDI > 0.700 & HDI < 0.799)
+countryVeryHigh <- filter(dataset, HDI > 0.800  & HDI < 1)
+
+#pib/capita,idh,suicide
+
+value <- round(c(mean(countryLow$suicides_no),mean(countryMedium$suicides_no), 
+           mean(countryHigh$suicides_no),mean(countryVeryHigh$suicides_no),
+           mean(countryLow$gdp_per_capita....),mean(countryMedium$gdp_per_capita....),
+           mean(countryHigh$gdp_per_capita....),mean(countryVeryHigh$gdp_per_capita....)))
+
+value <- matrix(value, nrow = 2 , ncol = 4, byrow = T)
+
+plot<-barplot(value,main="Comparação de Suicidios pela categoria do IDH",names.arg = c("Low IDH Rate","Medium IDH Rate","High IDH Rate","Very High IDH Rate"),col= c("Blue","Orange"),beside = T,ylim = c(1,50000))
+
+text(plot,value +2000, label = as.character(value))
+
+legend("topleft",fil = c("Blue","Orange"),legend = c("Média de suicidios","PIB por Pessoa"))
+```
+
+#### Faixa Etária/Gênero
+
+Nesse gráfico, mostro quais grupos e faixa etária tem maior propensão ao ato de suicidio de forma mais direta.
+
+```{r Analise s/Age/genero}
+
+man<- filter(dataset,sex=="male")
+woman<-filter(dataset,sex=="female")
+
+group <- group_by(man, age)
+
+df_man<-summarise(group, mean(suicides_no))
+
+group <- group_by(woman, age)
+
+df_woman<-summarise(group, mean(suicides_no))
+
+df_man$`mean(suicides_no)` <- round(df_man$`mean(suicides_no)`)
+
+df_woman$`mean(suicides_no)` <- round(df_woman$`mean(suicides_no)`)
+
+value <- c(df_man$`mean(suicides_no)`,df_woman$`mean(suicides_no)`)
+
+value <- matrix(value, nrow = 2 , ncol = 6, byrow = T)
+
+plot<-barplot(value,main="Comparação da média de Suicidios por geração e gênero",space = c(0,2),names.arg = df_woman$age,col= c("Blue","Orange"),beside = T,ylim = c(1,1000),cex.names=0.8)
+
+text(plot+0.1,value+50, label = as.character(value))
+
+legend("topright",fil = c("Blue","Orange"),legend = c("Homen","Mulher"))
+```
+
+## Conclusões
+
+Este trabalho apresentou uma análise técnica dos dados de suicidio referentes a 93 paises durante o periodo de 1990-2016. O estudo permitiu um melhor entendimento da mudança temporal do suicidio durante esse intervalo. Por meio da Análise Correlativa, foi possivel aprender qual gênero e faixa etária tem maior tendência a cometer suicidio. Além de averiguar que fatores socioeconômicos tem uma ligação indireta, logo que os paises com maior PIB e IDH tiveram maior indice de suicidos que outros com menores indicadores.
+
+Estes resultados são importantes para médicos e educadores identificarem possiveis individuos que precisam de ajuda, de forma que não considerem suicidio como uma opção. Vale ressaltar que os dados são limitados apenas a indicadores como gênero,idade e outros valores socioeconômicos. O suicidio não acontece apenas devido a esses fatores, existem muitas outras variáveis que deveriam ser levadas em conta para identificar um individuo propenso a tal ato. Alguns pontos que poderiam melhorar essa análise, seriam informações a respeito do historico econômico e educacional do individuo, podendo traçar um perfil mais certeiro.
+
+Como trabalhos futuros, poderiam ser utilizadas estatisticas mais recentes para averiguar a evolução do suicidio com o tempo, além da expansão do número de paises de forma que o dataset se mostre mais realista sobre a porcentagem de tragédias do mundo.
+
+## Referências
+
+Materiais utilizados na argumentação da importância desse dataset:
+
+http://g1.globo.com/sp/presidente-prudente-regiao/blog/psicoblog/post/por-que-uma-pessoa-comete-suicidio.html
+https://revistagalileu.globo.com/Ciencia/Saude/noticia/2019/09/6-fatos-que-provam-por-que-ainda-precisamos-falar-de-suicidio.html
+https://apps.who.int/iris/bitstream/handle/10665/326948/WHO-MSD-MER-19.3-eng.pdf
+https://pt.wikipedia.org/wiki/%C3%8Dndice_de_Desenvolvimento_Humano
